@@ -1,0 +1,10 @@
+2026-06-16 14:15:16,113- INFO - Starting ETL Pipeline
+2026-06-16 14:15:16,957- INFO - Extracted 100 records
+2026-06-16 14:15:16,967- INFO - Transformed 100 records
+2026-06-16 14:15:17,066- INFO - Data loaded successfully
+2026-06-16 14:15:17,067- INFO - Pipeline completed successfully in 0.96 seconds
+2026-06-18 11:28:19,815- INFO - Starting ETL Pipeline
+2026-06-18 11:28:20,964- INFO - Extracted 100 records
+2026-06-18 11:28:21,073- INFO - Transformed 100 records
+2026-06-18 11:28:21,212- INFO - Data loaded successfully
+2026-06-18 11:28:21,212- INFO - Pipeline completed successfully in 1.40 seconds
