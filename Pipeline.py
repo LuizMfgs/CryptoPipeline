@@ -2,6 +2,7 @@ from Extract import extract
 from transform import transform
 from load import load
 from datetime import datetime
+from Quality import quality_report, validate
 import logging
 
 logging.basicConfig(
@@ -46,6 +47,20 @@ def main():
         logging.info(
             f"Transformed {len(transformed_df)} records"
         )
+        # ==========================
+        # Quality
+        # ==========================
+        validate(
+            transformed_df
+        )
+
+        quality_report (transformed_df)
+
+        logging.info(
+            "Data Quality Checks Passed"
+        )
+
+
 
         # ==========================
         # LOAD

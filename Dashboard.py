@@ -47,31 +47,93 @@ with col4:
     )   
 #Stats Table
 
-st.subheader("Top 20 Cryptocurrencies") 
-st.dataframe(
-    df.head(20)
+st.subheader(
+    "Top 20 Cryptocurrencies"
 )
-# Market Cap Chart
 
-st.subheader("Top 10 Market Caps")
+# Att
+last_update = pd.to_datetime(
+    df["etl_timestamp"].max()
+)
 
-top10 = (
-    df.sort_values(
+st.caption(
+    f"Last Update: {last_update.strftime('%d/%m/%Y %H:%M:%S')}"
+)
+
+# Big values formatation
+def format_market_value(value):
+
+    if value >= 1_000_000_000_000:
+        return f"${value / 1_000_000_000_000:.2f}T"
+
+    elif value >= 1_000_000_000:
+        return f"${value / 1_000_000_000:.2f}B"
+
+    elif value >= 1_000_000:
+        return f"${value / 1_000_000:.2f}M"
+
+    else:
+        return f"${value:,.0f}"
+
+
+# Copy to exibition
+df_display = df.head(20).copy()
+
+# Keep important columns
+df_display = df_display[
+    [
+        "name",
+        "market_cap_rank",
+        "current_price",
         "market_cap",
-        ascending=False
-    )
-    .head(10)
+        "total_volume",
+        "price_change_percentage_24h",
+        "volatility"
+    ]
+]
+
+# Rename columns
+df_display = df_display.rename(
+    columns={
+        "name": "Cryptocurrency",
+        "market_cap_rank": "Rank",
+        "current_price": "Current Price",
+        "market_cap": "Market Cap",
+        "total_volume": "24h Volume",
+        "price_change_percentage_24h": "24h Change (%)",
+        "volatility": "Volatility (%)"
+    }
 )
 
-fig = px.bar(
-    top10,
-    x="name",
-    y="market_cap",
-    title="Top 10 Cryptocurrencies by Market Cap"
+df_display["Current Price"] = (
+    df_display["Current Price"]
+    .apply(lambda x: f"${x:,.2f}")
 )
 
-st.plotly_chart(
-    fig,
+df_display["Market Cap"] = (
+    df_display["Market Cap"]
+    .apply(format_market_value)
+)
+
+df_display["24h Volume"] = (
+    df_display["24h Volume"]
+    .apply(format_market_value)
+)
+
+df_display["24h Change (%)"] = (
+    df_display["24h Change (%)"]
+    .round(2)
+)
+
+df_display["Volatility (%)"] = (
+    df_display["Volatility (%)"]
+    .round(2)
+)
+
+# Exibe tabela
+st.dataframe(
+    df_display,
+    hide_index=True,
     use_container_width=True
 )
 
