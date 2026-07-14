@@ -82,13 +82,14 @@ df_display = df.head(20).copy()
 # Keep important columns
 df_display = df_display[
     [
-        "name",
+       "name",
         "market_cap_rank",
         "current_price",
         "market_cap",
         "total_volume",
         "price_change_percentage_24h",
-        "volatility"
+        "ath_change_percentage",
+        "liquidity_ratio"
     ]
 ]
 
@@ -101,7 +102,8 @@ df_display = df_display.rename(
         "market_cap": "Market Cap",
         "total_volume": "24h Volume",
         "price_change_percentage_24h": "24h Change (%)",
-        "volatility": "Volatility (%)"
+        "ath_change_percentage": "ATH Change (%)",
+        "liquidity_ratio": "Liquidity Ratio (%)"
     }
 )
 
@@ -125,8 +127,18 @@ df_display["24h Change (%)"] = (
     .round(2)
 )
 
-df_display["Volatility (%)"] = (
-    df_display["Volatility (%)"]
+df_display["24h Change (%)"] = (
+    df_display["24h Change (%)"]
+    .round(2)
+)
+
+df_display["ATH Change (%)"] = (
+    df_display["ATH Change (%)"]
+    .round(2)
+)
+
+df_display["Liquidity Ratio (%)"] = (
+    df_display["Liquidity Ratio (%)"]
     .round(2)
 )
 
@@ -143,22 +155,21 @@ st.subheader(
     "Most Volatile Cryptocurrencies"
 )
 
-top_volatility = (
+top_liquidity = (
     df.sort_values(
-        "volatility",
+        "liquidity_ratio",
         ascending=False
-    )
-    .head(10)
+    ).head(10)
 )
 
 fig = px.bar(
-    top_volatility,
+    top_liquidity,
     x="name",
-    y="volatility",
-    title="Most Volatile Cryptocurrencies (24h)",
+    y="liquidity_ratio",
+    title="Top 10 Cryptocurrencies by Liquidity Ratio",
     labels={
         "name": "Cryptocurrency",
-        "volatility": "24h Volatility (%)"
+        "liquidity_ratio": "Liquidity Ratio (%)"
     }
 )
 

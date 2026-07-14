@@ -14,7 +14,7 @@ def transform(df):
         "market_cap_rank",
         "total_volume",
         "price_change_percentage_24h",
-        "roi"
+        "ath_change_percentage"
                 ]
     df = df[colunas].copy()
     df = df.dropna(
@@ -24,35 +24,31 @@ def transform(df):
             "market_cap"
         ]
     )
-# Preenche valores ausentes da variação 24h
+ # Preenche valores ausentes
     df["price_change_percentage_24h"] = (
-    df["price_change_percentage_24h"]
-    .fillna(0)
-        )
-
-
-    # Extrair apenas o campo "times" do ROI
-    df["roi_times"] = df["roi"].apply(
-        lambda x: x.get("times")
-        if isinstance(x, dict)
-        else None
-    )
-
-    df = df.drop(columns=["roi"])
-
-    df["volume_marketcap_ratio"] = (
-        df["total_volume"] /
-        df["market_cap"]
-    )
-
-    # Volatilidade absoluta
-    df["volatility"] = (
         df["price_change_percentage_24h"]
-        .abs()
+        .fillna(0)
     )
+
+    df["ath_change_percentage"] = (
+        df["ath_change_percentage"]
+        .fillna(0)
+    )
+
+    # Liquidity Ratio (%)
+    df["liquidity_ratio"] = (
+        (
+            df["total_volume"] /
+            df["market_cap"]
+        ) * 100
+    ).round(2)
+
+    # Timestamp da execução
     df["etl_timestamp"] = datetime.now()
+
     return df
-   
+
+
 if __name__ == "__main__":
 
     print("=" * 50)
@@ -81,7 +77,7 @@ if __name__ == "__main__":
     print(transformed_df.columns.tolist())
 
     print("\nTop 20 Cryptocurrencies by Market Cap Rank:")
-    
+
     print(
         transformed_df[
             [
@@ -90,9 +86,12 @@ if __name__ == "__main__":
                 "symbol",
                 "current_price",
                 "market_cap",
-                "volatility"
+                "price_change_percentage_24h",
+                "ath_change_percentage",
+                "liquidity_ratio"
             ]
-        ] .sort_values("market_cap_rank")
+        ]
+        .sort_values("market_cap_rank")
         .head(20)
     )
 
@@ -105,7 +104,9 @@ if __name__ == "__main__":
             [
                 "current_price",
                 "market_cap",
-                "volatility"
+                "price_change_percentage_24h",
+                "ath_change_percentage",
+                "liquidity_ratio"
             ]
         ].describe()
     )
