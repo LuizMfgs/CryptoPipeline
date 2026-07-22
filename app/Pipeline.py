@@ -1,8 +1,8 @@
-from Extract import extract
-from transform import transform
-from load import load
+from app.Extract import extract
+from app.Transform import transform
+from app.Load import load
 from datetime import datetime
-from Quality import quality_report, validate
+from app.Quality import quality_report, validate
 import logging
 
 # LOGGING
