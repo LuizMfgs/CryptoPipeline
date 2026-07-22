@@ -1,6 +1,6 @@
 from app.Extract import extract
 from app.Transform import transform
-from app.Load import load
+from app.Load import load_data, remove_old_data
 from datetime import datetime
 from app.Quality import quality_report, validate
 import logging
@@ -62,9 +62,19 @@ def main():
         
         # LOAD
        
-        load(transformed_df)
+        load_data(transformed_df)
 
         logging.info("Data loaded successfully")
+
+        #Remove dados antigos
+
+        remove_old_data(days=7)
+
+        logging.info("Old records removed successfully")
+
+        load_data(transformed_df)
+
+        remove_old_data()
 
         # FINISH
 

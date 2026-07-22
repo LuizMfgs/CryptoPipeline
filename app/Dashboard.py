@@ -1,10 +1,13 @@
-import sqlite3
+from app.Database.Database import engine
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-
+from app.Database.Repository import CryptoRepository
 # PAGE CONFIG
 
+rows = CryptoRepository.get_latest_snapshot(
+
+)
 st.set_page_config(
     page_title="Crypto Dashboard",
     layout="wide"
@@ -19,20 +22,24 @@ st.divider()
 
 # DATABASE
 
-conn = sqlite3.connect("data/crypto.db")
 
-query = """
-SELECT *
-FROM cryptocurrencies
-WHERE etl_timestamp = (
-    SELECT MAX(etl_timestamp)
-    FROM cryptocurrencies
+df = pd.DataFrame(
+    rows,
+    columns=[
+        "id",
+        "coin_id",
+        "symbol",
+        "name",
+        "current_price",
+        "market_cap",
+        "market_cap_rank",
+        "total_volume",
+        "price_change_percentage_24h",
+        "ath_change_percentage",
+        "liquidity_ratio",
+        "etl_timestamp",
+    ],
 )
-ORDER BY market_cap_rank
-"""
-
-df = pd.read_sql_query(query, conn)
-conn.close()
 
 
 # LAST UPDATE
@@ -332,5 +339,5 @@ with col4:
     st.divider()
 
 st.caption(
-    "Developed with Python • Streamlit • SQLite • Plotly • CoinGecko API"
+    "Developed with Python • Streamlit • PostgreeSQL • Plotly • CoinGecko API"
 )

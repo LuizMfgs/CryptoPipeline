@@ -1,10 +1,5 @@
-import sqlite3
+from app.Database.Database import engine
 import pandas as pd 
-
-
-conn = sqlite3.connect(
-    "data/crypto.db"
-)
 
 query = """
 Select
@@ -20,8 +15,10 @@ ORDER BY market_cap_rank
 LIMIT 20
 """
 
-df = pd.read_sql_query(query,conn)
+df = pd.read_sql(
+    query,engine
+)
 
 print(df)
 
-conn.close()    
+ 
