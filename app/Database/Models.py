@@ -4,7 +4,9 @@ from sqlalchemy import (
     String,
     Float,
     BigInteger,
-    DateTime
+    DateTime,
+    CheckConstraint,
+    Index
 )
 
 from sqlalchemy.orm import declarative_base
@@ -16,26 +18,136 @@ class Cryptocurrency(Base):
 
     __tablename__ = "cryptocurrencies"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    __table_args__ = (
 
-    coin_id = Column(String(100), nullable=False)
+        CheckConstraint(
+            "current_price >= 0",
+            name="ck_current_price"
+        ),
 
-    symbol = Column(String(20), nullable=False)
+        CheckConstraint(
+            "market_cap >= 0",
+            name="ck_market_cap"
+        ),
 
-    name = Column(String(100), nullable=False)
+        CheckConstraint(
+            "market_cap_rank >= 1",
+            name="ck_market_cap_rank"
+        ),
 
-    current_price = Column(Float, nullable=False)
+        CheckConstraint(
+            "total_volume >= 0",
+            name="ck_total_volume"
+        ),
 
-    market_cap = Column(BigInteger, nullable=False)
+        CheckConstraint(
+            "liquidity_ratio >= 0",
+            name="ck_liquidity_ratio"
+        ),
 
-    market_cap_rank = Column(Integer)
+        Index("idx_coin_symbol", "symbol"),
+        Index("idx_market_cap", "market_cap"),
+        Index("idx_market_rank", "market_cap_rank"),
+        Index("idx_etl_timestamp", "etl_timestamp"),
 
-    total_volume = Column(BigInteger)
+    )
 
-    price_change_percentage_24h = Column(Float)
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
 
-    ath_change_percentage = Column(Float)
+    coin_id = Column(
+        String(100),
+        nullable=False,
+        unique=True
+    )
 
-    liquidity_ratio = Column(Float)
+    symbol = Column(
+        String(20),
+        nullable=False
+    )
 
-    etl_timestamp = Column(DateTime, nullable=False)
+    name = Column(
+        String(100),
+        nullable=False
+    )
+
+    current_price = Column(
+        Float,
+        nullable=False
+    )
+
+    market_cap = Column(
+        BigInteger,
+        nullable=False
+    )
+
+    market_cap_rank = Column(
+        Integer
+    )
+
+    total_volume = Column(
+        BigInteger
+    )
+
+    price_change_percentage_24h = Column(
+        Float
+    )
+
+    ath_change_percentage = Column(
+        Float
+    )
+
+    liquidity_ratio = Column(
+        Float
+    )
+
+    etl_timestamp = Column(
+        DateTime,
+        nullable=False
+    )
+class ETLExecution(Base):
+
+    __tablename__ = "etl_execution"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    start_time = Column(
+        DateTime,
+        nullable=False
+    )
+
+    end_time = Column(
+        DateTime,
+        nullable=False
+    )
+
+    duration_seconds = Column(
+        Float,
+        nullable=False
+    )
+
+    rows_extracted = Column(
+        Integer,
+        nullable=False
+    )
+
+    rows_loaded = Column(
+        Integer,
+        nullable=False
+    )
+
+    status = Column(
+        String(20),
+        nullable=False
+    )
+
+    error_message = Column(
+        String(1000)
+    )

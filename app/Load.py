@@ -1,13 +1,28 @@
+import logging
+
 from app.Database.Repository import CryptoRepository
+
+
+logger = logging.getLogger(__name__)
 
 
 def load_data(df):
 
-    CryptoRepository.save_dataframe(df)
+    rows = CryptoRepository.save_dataframe(df)
 
-    print(f"{len(df)} records inserted successfully.")
+    logger.info("%s records inserted.", rows)
+
+    print(f"{rows} records inserted successfully.")
+
+    return rows
 
 
-def remove_old_data():
+def remove_old_data(days):
 
-    CryptoRepository.remove_old_data()
+    removed = CryptoRepository.remove_old_data(days)
+
+    logger.info("%s old records removed.", removed)
+
+    print(f"{removed} old records removed.")
+
+    return removed

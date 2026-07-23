@@ -172,20 +172,10 @@ st.divider()
 st.subheader("📊 Market Analytics")
 
 # CHARTS
-top_liquidity = (
-    df.sort_values(
-        "liquidity_ratio",
-        ascending=False
-    )
-    .head(10)
-)
-top_change = (
-    df.sort_values(
-        "price_change_percentage_24h",
-        ascending=False
-    )
-    .head(10)
-)
+top_liquidity = CryptoRepository.get_top_liquidity()
+
+top_change = CryptoRepository.get_top_gainers()
+
 left_space, col_left, col_right, right_space = st.columns([1,4,4,1])
 
 # ---------- Liquidity ----------
@@ -257,12 +247,7 @@ left, col3, col4, right = st.columns([1,4,4,1])
 
 with col3:
 
-    top_marketcap = (
-        df.nlargest(
-            10,
-            "market_cap"
-        )
-    )
+    top_marketcap = CryptoRepository.get_top_marketcap()
 
     fig_marketcap = px.bar(
 
@@ -297,12 +282,7 @@ with col3:
 #TRADING VOLUME
 with col4:
 
-    top_volume = (
-        df.nlargest(
-            10,
-            "total_volume"
-        )
-    )
+    top_volume = CryptoRepository.get_top_volume()
 
     fig_volume = px.bar(
 
