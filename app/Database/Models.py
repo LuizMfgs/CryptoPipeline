@@ -6,6 +6,7 @@ from sqlalchemy import (
     BigInteger,
     DateTime,
     CheckConstraint,
+    UniqueConstraint,
     Index
 )
 
@@ -20,37 +21,50 @@ class Cryptocurrency(Base):
 
     __table_args__ = (
 
-        CheckConstraint(
-            "current_price >= 0",
-            name="ck_current_price"
-        ),
+    UniqueConstraint(
+        "coin_id",
+        "etl_timestamp",
+        name="uq_coin_snapshot"
+    ),
 
-        CheckConstraint(
-            "market_cap >= 0",
-            name="ck_market_cap"
-        ),
+    CheckConstraint(
+        "current_price >= 0",
+        name="ck_current_price"
+    ),
 
-        CheckConstraint(
-            "market_cap_rank >= 1",
-            name="ck_market_cap_rank"
-        ),
+    CheckConstraint(
+        "market_cap >= 0",
+        name="ck_market_cap"
+    ),
 
-        CheckConstraint(
-            "total_volume >= 0",
-            name="ck_total_volume"
-        ),
+    CheckConstraint(
+        "market_cap_rank >= 1",
+        name="ck_market_cap_rank"
+    ),
 
-        CheckConstraint(
-            "liquidity_ratio >= 0",
-            name="ck_liquidity_ratio"
-        ),
+    CheckConstraint(
+        "total_volume >= 0",
+        name="ck_total_volume"
+    ),
 
-        Index("idx_coin_symbol", "symbol"),
-        Index("idx_market_cap", "market_cap"),
-        Index("idx_market_rank", "market_cap_rank"),
-        Index("idx_etl_timestamp", "etl_timestamp"),
+    CheckConstraint(
+        "liquidity_ratio >= 0",
+        name="ck_liquidity_ratio"
+    ),
 
-    )
+    Index("idx_coin_id", "coin_id"),
+
+    Index("idx_symbol", "symbol"),
+
+    Index("idx_market_cap", "market_cap"),
+
+    Index("idx_market_rank", "market_cap_rank"),
+
+    Index("idx_etl_timestamp", "etl_timestamp"),
+
+    Index("idx_symbol_timestamp", "symbol", "etl_timestamp"),
+
+)
 
     id = Column(
         Integer,
@@ -103,7 +117,6 @@ class Cryptocurrency(Base):
     liquidity_ratio = Column(
         Float
     )
-
     etl_timestamp = Column(
         DateTime,
         nullable=False

@@ -2,7 +2,9 @@ import pandas as pd
 from sqlalchemy import text
 from app.Database.Database import engine
 from app.Database.Models import ETLExecution
-from app.Database.Database import SessionLocal
+from app.Database.Database import get_session
+from app.Database.Models import Cryptocurrency
+from datetime import datetime, timedelta
 
 TABLE_NAME = "cryptocurrencies"
 
@@ -13,15 +15,38 @@ class CryptoRepository:
     # ==========================================
 
     @staticmethod
+    @staticmethod
     def save_dataframe(df):
 
-        df.to_sql(
-            TABLE_NAME,
-            con=engine,
-            if_exists="append",
-            index=False,
-            method="multi"
-        )
+        with get_session() as session:
+
+            coins = []
+
+            for _, row in df.iterrows():
+
+                coins.append(
+
+                    Cryptocurrency(
+
+                    coin_id=row["coin_id"],
+                    symbol=row["symbol"],
+                    name=row["name"],
+                    current_price=row["current_price"],
+                    market_cap=row["market_cap"],
+                    market_cap_rank=row["market_cap_rank"],
+                    total_volume=row["total_volume"],
+                    price_change_percentage_24h=row["price_change_percentage_24h"],
+                    ath_change_percentage=row["ath_change_percentage"],
+                    liquidity_ratio=row["liquidity_ratio"],
+                    etl_timestamp=row["etl_timestamp"]
+
+                )
+
+            )
+
+            session.bulk_save_objects(coins)
+            session.commit()
+            return len(coins)
 
     # ==========================================
     # SELECTS
@@ -104,7 +129,7 @@ class CryptoRepository:
         error_message=None
         ):
 
-        with SessionLocal() as session:
+        with get_session() as session:
 
             execution = ETLExecution(
 
@@ -131,7 +156,7 @@ class CryptoRepository:
     @staticmethod
     def get_last_execution():
 
-        with SessionLocal() as session:
+        with get_session() as session:
 
             return (
 
@@ -145,7 +170,7 @@ class CryptoRepository:
     @staticmethod
     def get_execution_history(limit=20):
 
-        with SessionLocal() as session:
+        with get_session() as session:
 
                 return (
 
@@ -281,20 +306,24 @@ class CryptoRepository:
     @staticmethod
     def remove_old_data(days=7):
 
-        query = text("""
-            DELETE
-            FROM cryptocurrencies
-            WHERE etl_timestamp <
-                  NOW() - (:days * INTERVAL '1 day')
-        """)
+        with get_session() as session:
 
-        with engine.begin() as conn:
+            deleted = (
 
-            conn.execute(
-                query,
-                {"days": days}
+            session.query(Cryptocurrency)
+
+            .filter(
+
+                Cryptocurrency.etl_timestamp <
+                datetime.now() - timedelta(days=days)
+
             )
 
+            .delete(synchronize_session=False)
+
+        )
+
+        return deleted
     # ==========================================
     # ADMIN
     # ==========================================
@@ -302,11 +331,15 @@ class CryptoRepository:
     @staticmethod
     def reset_table():
 
-        query = text("""
-            TRUNCATE TABLE cryptocurrencies
-            RESTART IDENTITY
-        """)
+        with get_session() as session:
 
-        with engine.begin() as conn:
+            session.execute(
 
-            conn.execute(query)
+                text("""
+
+                TRUNCATE TABLE cryptocurrencies
+                RESTART IDENTITY CASCADE
+
+            """)
+
+        )
