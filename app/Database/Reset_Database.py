@@ -1,6 +1,6 @@
 from sqlalchemy import text
 
-from app.Database.Database import engine
+from app.database.Database import engine
 
 
 def reset_database():

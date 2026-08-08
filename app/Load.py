@@ -1,28 +1,93 @@
 import logging
-
+import pandas as pd
 from app.Database.Repository import CryptoRepository
-
 
 logger = logging.getLogger(__name__)
 
+def load_data(df: pd.DataFrame) -> int:
+    """
+    Load transformed cryptocurrency data
+    into PostgreSQL.
 
-def load_data(df):
+    Args:
+        df: Transformed cryptocurrency DataFrame.
 
-    rows = CryptoRepository.save_dataframe(df)
+    Returns:
+        Number of records inserted.
+    """
 
-    logger.info("%s records inserted.", rows)
+    if df.empty:
+        logger.warning(
+            "Load skipped: received empty DataFrame."
+        )
 
-    print(f"{rows} records inserted successfully.")
+        return 0
 
-    return rows
+    logger.info(
+        "Starting load: %s records.",
+        len(df)
+    )
+
+    try:
+
+        rows = CryptoRepository.save_dataframe(df)
+
+        logger.info(
+            "Load completed successfully: "
+            "%s records inserted.",
+            rows
+        )
+
+        return rows
+
+    except Exception:
+        logger.exception(
+            "Failed to load cryptocurrency data."
+        )
+
+        raise
 
 
-def remove_old_data(days):
+def remove_old_data(days: int) -> int:
+    """
+    Remove historical records older than
+    the specified number of days.
 
-    removed = CryptoRepository.remove_old_data(days)
+    Args:
+        days: Number of days to preserve.
 
-    logger.info("%s old records removed.", removed)
+    Returns:
+        Number of records removed.
+    """
 
-    print(f"{removed} old records removed.")
+    if days <= 0:
+        raise ValueError(
+            "days must be greater than zero."
+        )
 
-    return removed
+    logger.info(
+        "Starting historical data cleanup. "
+        "Retention: %s days.",
+        days
+    )
+
+    try:
+
+        removed = (
+            CryptoRepository.remove_old_data(days)
+        )
+
+        logger.info(
+            "Historical cleanup completed: "
+            "%s records removed.",
+            removed
+        )
+
+        return removed
+
+    except Exception:
+        logger.exception(
+            "Failed to remove old records."
+        )
+
+        raise
