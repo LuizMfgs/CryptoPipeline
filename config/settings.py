@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # PROJECT PATHS
 
-BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 LOG_DIR = BASE_DIR / "logs"
 
@@ -61,7 +61,7 @@ class Settings(BaseSettings):
 
     POSTGRES_PORT: int = 5432
 
-    POSTGRES_DB: str = "crypto_db"
+    POSTGRES_DB: str = "Crypto_Market"
 
     POSTGRES_USER: str = "postgres"
 

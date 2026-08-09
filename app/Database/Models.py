@@ -73,9 +73,8 @@ class Cryptocurrency(Base):
     )
 
     coin_id = Column(
-        String(100),
-        nullable=False,
-        unique=True
+    String(100),
+    nullable=False
     )
 
     symbol = Column(

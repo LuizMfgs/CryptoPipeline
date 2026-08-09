@@ -1,8 +1,8 @@
-from app.Database.Database import engine
+from app.database.Database import engine
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-from app.Database.Repository import CryptoRepository
+from app.database.Repository import CryptoRepository
 # PAGE CONFIG
 
 rows = CryptoRepository.get_latest_snapshot(

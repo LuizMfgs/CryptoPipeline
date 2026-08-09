@@ -1,6 +1,6 @@
 import logging
 import pandas as pd
-from app.Database.Repository import CryptoRepository
+from app.database.Repository import CryptoRepository
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def load_data(df: pd.DataFrame) -> int:
 
     try:
 
-        rows = CryptoRepository.save_dataframe(df)
+        rows = CryptoRepository.insert_snapshots(df)
 
         logger.info(
             "Load completed successfully: "

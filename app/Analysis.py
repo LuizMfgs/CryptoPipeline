@@ -1,4 +1,4 @@
-from app.Database.Database import engine
+from app.database.Database import engine
 import pandas as pd 
 
 query = """

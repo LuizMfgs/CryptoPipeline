@@ -1,10 +1,7 @@
 import logging
 from datetime import datetime, timedelta, timezone
-
 import pandas as pd
-
 from sqlalchemy import text
-
 from app.database.Database import engine, get_session
 from app.database.Models import Cryptocurrency, ETLExecution
 
@@ -23,7 +20,6 @@ class CryptoRepository:
 
         Historical snapshots are preserved.
         """
-
         if df.empty:
             logger.warning(
                 "No data to insert."
@@ -33,7 +29,6 @@ class CryptoRepository:
         records = df.to_dict(
             orient="records"
         )
-
         with get_session() as session:
 
             coins = [
@@ -60,7 +55,6 @@ class CryptoRepository:
                 )
                 for row in records
             ]
-
             session.add_all(coins)
 
             logger.info(
@@ -68,7 +62,6 @@ class CryptoRepository:
                 "inserted.",
                 len(coins)
             )
-
             return len(coins)
 
     # LATEST SNAPSHOT
@@ -422,3 +415,54 @@ class CryptoRepository:
         logger.warning(
             "Cryptocurrency table was reset."
         )
+class ETLRepository:
+
+    @staticmethod
+    def save_execution(
+        start_time,
+        end_time,
+        duration,
+        rows_extracted,
+        rows_loaded,
+        status,
+        error_message=None,
+    ):
+        with get_session() as session:
+
+            execution = ETLExecution(
+                start_time=start_time,
+                end_time=end_time,
+                duration_seconds=duration,
+                rows_extracted=rows_extracted,
+                rows_loaded=rows_loaded,
+                status=status,
+                error_message=error_message,
+            )
+
+            session.add(execution)
+            session.commit()
+
+            return execution
+
+    @staticmethod
+    def get_last_execution():
+
+        with get_session() as session:
+
+            return (
+                session.query(ETLExecution)
+                .order_by(ETLExecution.id.desc())
+                .first()
+            )
+
+    @staticmethod
+    def get_execution_history(limit=20):
+
+        with get_session() as session:
+
+            return (
+                session.query(ETLExecution)
+                .order_by(ETLExecution.id.desc())
+                .limit(limit)
+                .all()
+            )        
