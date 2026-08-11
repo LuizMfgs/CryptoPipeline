@@ -117,8 +117,8 @@ class Cryptocurrency(Base):
         Float
     )
     etl_timestamp = Column(
-        DateTime,
-        nullable=False
+        DateTime(timezone=True),
+        nullable=False  
     )
 class ETLExecution(Base):
 
