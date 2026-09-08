@@ -1,199 +1,182 @@
-Crypto Market ETL & Analytics
+# Crypto ETL Pipeline
 
-An end-to-end Data Engineering project that extracts cryptocurrency market data from the CoinGecko API, validates data quality, stores historical records in PostgreSQL, and provides an interactive dashboard built with Streamlit.
+ETL pipeline for cryptocurrency market data using **Python, CoinGecko API and PostgreSQL**.
 
-The project demonstrates a complete ETL workflow, including data extraction, transformation, validation, storage, visualization, and automated execution.
+The project extracts market data, transforms and validates the dataset, calculates derived metrics, and stores historical snapshots in PostgreSQL.
 
----
-
-# Project Overview
-
-This project was developed to simulate a production-ready data pipeline used in financial analytics environments.
-
-The pipeline:
-
-- Extracts cryptocurrency market data from the CoinGecko API
-- Cleans and transforms the dataset
-- Performs automated data quality validation
-- Loads data into PostgreSQL
-- Preserves historical records
-- Powers an interactive Streamlit dashboard
-- Supports scheduled automatic execution
-
----
-
-# Architecture
+## Architecture
 
 ```text
 CoinGecko API
-       │
-       ▼
-Extract.py
-       │
-       ▼
-Transform.py
-       │
-       ▼
-Quality.py
-       │
-       ▼
-Load.py
-       │
-       ▼
-PostgreSQL
-       │
-       ▼
-Dashboard.py (Streamlit)
+      ↓
+   Extract
+      ↓
+  Transform
+      ↓
+     Load
+      ↓
+ PostgreSQL
 ```
 
----
+## Features
 
+* CoinGecko API extraction with pagination
+* HTTP retries and timeout handling
+* Data validation and cleaning
+* Duplicate removal
+* Liquidity ratio calculation
+* Historical cryptocurrency snapshots
+* PostgreSQL constraints and indexes
+* Transaction rollback
+* Old snapshot cleanup
+* Dockerized PostgreSQL
+* Automated tests
 
+## Tech Stack
 
-# Technologies
+* Python 3.13
+* Pandas
+* Requests
+* PostgreSQL
+* SQLAlchemy
+* Pydantic Settings
+* Pytest
+* Docker
 
-- Python
-- Pandas
-- SQLAlchemy
-- PostgreSQL
-- Streamlit
-- CoinGecko API
-- Requests
-- Logging
+## Project Structure
 
----
-
-# Dashboard Features
-
-The dashboard includes:
-
-- Market Overview KPIs
-- Top 20 Cryptocurrencies
-- Top Market Cap
-- Highest Liquidity Ratio
-- Largest 24h Gains
-- Highest Trading Volume
-- Automatic Last Update timestamp
-
----
-
-# Data Quality Validation
-
-Before loading the data, the pipeline automatically validates:
-
-- Empty datasets
-- Missing prices
-- Missing market capitalization
-- Negative prices
-- Duplicate records
-- Missing values
-
-If any validation fails, the pipeline stops before loading data.
-
----
-
-# Database
-
-The project uses PostgreSQL for persistent storage.
-
-Historical market snapshots are preserved, allowing time-series analysis.
-
-Old records can be automatically removed after a configurable retention period (default: 7 days).
-
----
-
-# Automation
-
-The ETL pipeline is designed to run automatically every 30 minutes.
-
-Execution logs are stored in the logs folder.
-
-Each execution:
-
-- extracts new market data
-- validates quality
-- stores historical records
-- updates the dashboard source
-
----
-
-# Environment Variables
-
-Database credentials are stored securely using a `.env` file.
-
-Example:
-
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=crypto_db
-DB_USER=postgres
-DB_PASSWORD=your_password
+```text
+Cripto-ETL/
+├── app/
+│   ├── Extract.py
+│   ├── Transform.py
+│   ├── Load.py
+│   └── database/
+│       ├── Database.py
+│       ├── Models.py
+│       └── Repository.py
+├── config/
+│   └── settings.py
+├── tests/
+├── docker-compose.yml
+├── .env.example
+├── LICENSE
+└── README.md
 ```
 
----
+## Installation
 
-# Installation
+Create the virtual environment:
 
-Clone the repository
-
-```bash
-git clone https://github.com/LuizMfgs/crypto-etl.git
-```
-
-Create a virtual environment
-
-```bash
+```powershell
 python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-Activate it
+Install the dependencies:
 
-Windows
-
-```bash
-.venv\Scripts\Activate.ps1
-```
-
-Install dependencies
-
-```bash
+```powershell
 pip install -r requirements.txt
 ```
 
----
+Configure the environment variables using `.env.example`.
 
-# ▶️ Running the ETL Pipeline
+## Database
 
-```bash
-python app/pipeline.py
+Start PostgreSQL with Docker:
+
+```powershell
+docker compose up -d
 ```
 
----
+Check the container:
 
-# ▶️ Running the Dashboard
-
-```bash
-streamlit run app/Dashboard.py
+```powershell
+docker compose ps
 ```
 
----
+## Running the Pipeline
 
-#  Future Improvements
+```powershell
+python -m app.Pipeline
+```
 
-- Docker support
-- Apache Airflow orchestration
-- Unit and integration tests
-- CI/CD pipeline using GitHub Actions
-- Cloud deployment (AWS or Azure)
-- Real-time market monitoring
-- Email alerts for data quality failures
-- REST API for historical data
+The pipeline executes:
 
----
+```text
+Extract → Transform → Load
+```
 
-#  Author
+## Testing
+
+Run the complete test suite:
+
+```powershell
+python -m pytest tests -v
+```
+
+Current test status:
+
+```text
+31 passed
+```
+
+The tests cover:
+
+* Database connectivity
+* Database constraints
+* Transaction rollback
+* Batch rollback
+* Duplicate snapshots
+* Multiple historical snapshots
+* Empty DataFrames
+* Data cleanup
+* Extraction validation
+* Data transformation
+* Duplicate removal
+* Liquidity ratio calculation
+* ETL timestamp validation
+
+## Historical Snapshots
+
+The pipeline preserves historical cryptocurrency observations instead of overwriting previous records.
+
+Snapshots are identified by:
+
+```text
+coin_id + etl_timestamp
+```
+
+This allows the same cryptocurrency to be stored across multiple ETL executions while preventing duplicate snapshots.
+
+## Future Improvements
+
+* Add CI/CD with GitHub Actions
+* Add code coverage reporting
+* Add database migrations with Alembic
+* Add pipeline scheduling
+* Add monitoring and alerting
+* Add analytical views for historical data
+* Add a data visualization dashboard
+* Evaluate orchestration with Apache Airflow
+* Improve observability with structured logging
+
+## Documentation
+
+Additional technical documentation can be found in the `docs/` directory:
+
+* `architecture.md` — system architecture
+* `data-model.md` — database structure
+* `pipeline.md` — ETL workflow
+* `testing.md` — testing strategy
+* `decisions.md` — main technical decisions
+
+## Author
 
 **Luiz Miguel Fernandes**
 
-Data Engineering | Python | SQL | PostgreSQL | ETL | Data Analytics
+Data / Infrastructure Engineering
+
+## License
+
+MIT License.
