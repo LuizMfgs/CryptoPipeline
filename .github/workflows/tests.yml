@@ -5,7 +5,6 @@ push:
 branches:
 - main
 - develop
-
 pull_request:
 branches:
 - main
@@ -19,32 +18,23 @@ runs-on: ubuntu-latest
 services:
   postgres:
     image: postgres:17
-
     env:
       POSTGRES_DB: crypto_etl_test
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
     ports:
       - 5432:5432
-
-    options: >-
-      --health-cmd="pg_isready -U postgres -d crypto_etl_test"
-      --health-interval=10s
-      --health-timeout=5s
-      --health-retries=5
+    options: --health-cmd="pg_isready -U postgres -d crypto_etl_test" --health-interval=10s --health-timeout=5s --health-retries=5
 
 env:
-  DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/crypto_etl_test
-
-  POSTGRES_HOST: localhost
-  POSTGRES_PORT: 5432
-  POSTGRES_DB: crypto_etl_test
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
+  DATABASE_URL: "postgresql+psycopg2://postgres:postgres@localhost:5432/crypto_etl_test"
+  POSTGRES_HOST: "localhost"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "crypto_etl_test"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PASSWORD: "postgres"
 
 steps:
-
   - name: Checkout repository
     uses: actions/checkout@v4
 
@@ -52,7 +42,7 @@ steps:
     uses: actions/setup-python@v5
     with:
       python-version: "3.13"
-      cache: "pip"
+      cache: pip
 
   - name: Install dependencies
     run: |
@@ -60,27 +50,6 @@ steps:
       pip install -r requirements.txt
       pip install pytest
 
-  - name: Wait for PostgreSQL
-    run: |
-      python - <<'PY'
-      import socket
-      import time
-
-      host = "localhost"
-      port = 5432
-
-      for _ in range(30):
-          try:
-              with socket.create_connection((host, port), timeout=2):
-                  print("PostgreSQL is ready.")
-                  break
-          except OSError:
-              time.sleep(1)
-      else:
-          raise RuntimeError("PostgreSQL did not become available.")
-      PY
-
   - name: Run tests
-    run: |
-      python -m pytest tests -v
+    run: python -m pytest tests -v
 ```
