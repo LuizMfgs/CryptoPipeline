@@ -5,6 +5,7 @@ push:
 branches:
 - main
 - develop
+
 pull_request:
 branches:
 - main
@@ -13,18 +14,23 @@ branches:
 jobs:
 tests:
 runs-on: ubuntu-latest
-
-```
 services:
   postgres:
     image: postgres:17
+
     env:
       POSTGRES_DB: crypto_etl_test
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
     ports:
       - 5432:5432
-    options: --health-cmd="pg_isready -U postgres -d crypto_etl_test" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    options: >-
+      --health-cmd "pg_isready -U postgres -d crypto_etl_test"
+      --health-interval 10s
+      --health-timeout 5s
+      --health-retries 5
 
 env:
   DATABASE_URL: "postgresql+psycopg2://postgres:postgres@localhost:5432/crypto_etl_test"
@@ -42,7 +48,7 @@ steps:
     uses: actions/setup-python@v5
     with:
       python-version: "3.13"
-      cache: pip
+      cache: "pip"
 
   - name: Install dependencies
     run: |
@@ -52,4 +58,3 @@ steps:
 
   - name: Run tests
     run: python -m pytest tests -v
-```
